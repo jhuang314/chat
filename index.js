@@ -14,11 +14,21 @@ app.use(express.static(__dirname + '/public'));
 
 var io = require('socket.io').listen(app.listen(port));
 
+var count = 0;
 io.sockets.on('connection', function(socket) {
-    socket.emit('message', {message: 'welcome to the chat'});
+    io.sockets.sockets['nickname'] = socket.id;
+    count++;
+    socket.emit('message', {message: 'welcome to the chat', count: count});
     socket.on('send', function(data) {
-	io.sockets.emit('message', data);
+	io.sockets.emit('message', {message: data.message, username: data.username, count: count});
     });
+    socket.on('disconnect', function () {
+	count--;
+    });
+
+
+
+    
 });
 
 
